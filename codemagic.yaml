@@ -1,0 +1,50 @@
+workflows:
+  ios-native-workflow:
+    name: iOS Native
+    max_build_duration: 120
+    integrations:
+      app_store_connect: CodeMagic Api Key
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.berniceric
+      vars:
+        BUNDLE_ID: "com.berniceric"
+        XCODE_PROJECT: "MealMission.xcodeproj" # Убедитесь, что имя проекта указано правильно
+        XCODE_SCHEME: "MealMission" # Убедитесь, что имя схемы указано правильно
+        APP_STORE_APPLE_ID: 6744488522
+        TEAM_ID: "FL8ZWRL4MC"  # Ваш Team ID
+      xcode: 16.0
+    scripts:
+      - name: Set up provisioning profiles settings on Xcode project
+        script: xcode-project use-profiles
+
+      - name: Increment build number
+        script: |
+          cd "$CM_BUILD_DIR"
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
+          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
+
+      - name: Build ipa for distribution
+        script: |
+          xcode-project build-ipa \
+            --project "$CM_BUILD_DIR/$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+
+    publishing:
+      email:
+        recipients:
+          - bernicerice199822@gmail.com
+        notify:
+          success: true
+          failure: false
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: false
+        submit_to_app_store: false
