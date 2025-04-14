@@ -4,6 +4,7 @@ workflows:
     max_build_duration: 120
     integrations:
       app_store_connect: CodeMagic Api Key
+      app_store_connect: CodeMagic Api Key Push
     environment:
       ios_signing:
         distribution_type: app_store

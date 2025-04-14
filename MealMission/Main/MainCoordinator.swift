@@ -3,7 +3,7 @@ import FirebaseAuth
 
 // MARK: - Screens Enum
 enum Screens {
-    case launchScreen
+//    case launchScreen
     case authorizationScreen
     case mainTabs
 }
@@ -11,14 +11,14 @@ enum Screens {
 // MARK: - MainCoordinator Class
 class MainCoordinator: ObservableObject {
     // MARK: - Published Properties
-    @Published var currentScreen: Screens = .launchScreen
+    @Published var currentScreen: Screens = .authorizationScreen
     
     // MARK: - Private Properties
     private var authHandle: AuthStateDidChangeListenerHandle?
 
     // MARK: - Initializer & Deinitializer
     init() {
-        currentScreen = .launchScreen
+        currentScreen = .authorizationScreen
         addAuthStateListener()
     }
 
@@ -37,8 +37,8 @@ class MainCoordinator: ObservableObject {
     }
     
     func handleLaunchScreenCompletion() {
-        if currentScreen == .launchScreen {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+//        if currentScreen == .launchScreen {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0) {
                 withAnimation {
                     if Auth.auth().currentUser == nil {
                         self.navigate(to: .authorizationScreen)
@@ -47,7 +47,7 @@ class MainCoordinator: ObservableObject {
                     }
                 }
             }
-        }
+//        }
     }
     
     func navigateToMainTabs() {
@@ -69,10 +69,10 @@ class MainCoordinator: ObservableObject {
                     } else if user == nil && self.currentScreen == .mainTabs {
                         print("Auth listener: User logged out from main tabs, navigating to authorization.")
                         self.navigate(to: .authorizationScreen)
-                    } else if user == nil && self.currentScreen == .launchScreen {
-                        print("Auth listener: User not logged in on launch, waiting for launch completion.")
-                    } else if user != nil && self.currentScreen == .launchScreen {
-                        print("Auth listener: User already logged in on launch, waiting for launch completion.")
+//                    } else if user == nil && self.currentScreen == .launchScreen {
+//                        print("Auth listener: User not logged in on launch, waiting for launch completion.")
+//                    } else if user != nil && self.currentScreen == .launchScreen {
+//                        print("Auth listener: User already logged in on launch, waiting for launch completion.")
                     }
                 }
             }
@@ -88,14 +88,13 @@ struct MainCoordinatorView: View {
     // MARK: - Body
     var body: some View {
         NavigationStack {
-            
             VStack {
                 switch coordinator.currentScreen {
-                case .launchScreen:
-                    LaunchScreenView()
-                        .onAppear {
-                            coordinator.handleLaunchScreenCompletion()
-                        }
+//                case .launchScreen:
+//                    LaunchScreenView()
+//                        .onAppear {
+//                            coordinator.handleLaunchScreenCompletion()
+//                        }
                 case .authorizationScreen:
                     AuthorizationView(coordinator: coordinator)
                 case .mainTabs:
@@ -103,7 +102,6 @@ struct MainCoordinatorView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            
             .background(
                 ZStack {
                     RadialGradient(
@@ -118,6 +116,9 @@ struct MainCoordinatorView: View {
                 }
                 .ignoresSafeArea()
             )
+            .onAppear {
+                coordinator.handleLaunchScreenCompletion()
+            }
         }
     }
 }

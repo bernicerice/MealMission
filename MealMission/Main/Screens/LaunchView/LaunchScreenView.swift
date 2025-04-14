@@ -30,11 +30,25 @@ struct LaunchScreenView: View {
                 .customFont(.customBold, size: FontSizes.loading)
                 .foregroundColor(.white)
         }
-        
+        .frame(maxWidth: .infinity)
+        .background(
+            ZStack {
+                RadialGradient(
+                    gradient: Gradient(colors: [Color(red: 69/255, green: 71/255, blue: 82/255), Color(red: 36/255, green: 38/255, blue: 47/255)]),
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: UIScreen.main.bounds.height / 2
+                )
+                Image("background")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            }
+            .ignoresSafeArea()
+        )
         // MARK: - Life Cycle
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                withAnimation(.easeInOut(duration: 3.5)) {
+                withAnimation(.easeInOut(duration: 8)) {
                     imageRevealFraction = 1.0
                 }
             }
