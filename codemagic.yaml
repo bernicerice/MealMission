@@ -11,34 +11,32 @@ workflows:
         bundle_identifier: com.berniceric
       vars:
         BUNDLE_ID: "com.berniceric"
-        XCODE_PROJECT: "MealMission.xcodeproj" # Убедитесь, что имя проекта указано правильно
-        XCODE_SCHEME: "MealMission" # Убедитесь, что имя схемы указано правильно
+        XCODE_PROJECT: "MealMission.xcodeproj"
+        XCODE_SCHEME: "MealMission"
         APP_STORE_APPLE_ID: 6744488522
-        TEAM_ID: "FL8ZWRL4MC"  # Ваш Team ID
-        CODE_SIGN_STYLE: "Automatic"
+        TEAM_ID: "FL8ZWRL4MC"
       xcode: 16.2
     scripts:
       - name: Set up provisioning profiles settings on Xcode project
-        script: xcode-project use-profiles
-
+        script: |
+          # Принудительно установить автоматическую подпись
+          xcode-project use-profiles --allow-provisioning-updates
       - name: Increment build number
         script: |
           cd "$CM_BUILD_DIR"
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
           agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
-
       - name: Build ipa for distribution
         script: |
           xcode-project build-ipa \
             --project "$CM_BUILD_DIR/$XCODE_PROJECT" \
-            --scheme "$XCODE_SCHEME"
-
+            --scheme "$XCODE_SCHEME" \
+            --config-option="CODE_SIGN_STYLE=Automatic"
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
       - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
-
     publishing:
       email:
         recipients:
