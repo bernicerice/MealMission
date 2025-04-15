@@ -15,6 +15,7 @@ workflows:
         XCODE_SCHEME: "MealMission" # Убедитесь, что имя схемы указано правильно
         APP_STORE_APPLE_ID: 6744488522
         TEAM_ID: "FL8ZWRL4MC"  # Ваш Team ID
+        CODE_SIGN_STYLE: "Automatic"
       xcode: 16.2
     scripts:
       - name: Set up provisioning profiles settings on Xcode project
